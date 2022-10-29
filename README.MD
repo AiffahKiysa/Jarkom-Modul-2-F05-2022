@@ -107,8 +107,14 @@ www     IN      CNAME   wise.f05.com.
 service bind9 restart
 clear
 echo "Set Up www.wise.f05.com done"
-
 ```
+Setelah selesai setup, pada node client, ubah file /etc/resolv.conf untuk mengarah ke IP Wise (10.31.2.2)
+```
+#Change nameserver to IP WISE
+echo "nameserver 10.31.2.2" > /etc/resolv.conf
+ping wise.f05.com -c 2				   
+```
+				   
 ## 3. Setelah itu ia juga ingin membuat subdomain eden.wise.yyy.com dengan alias www.eden.wise.yyy.com yang diatur DNS-nya di WISE dan mengarah ke Eden
 
 ```bash
@@ -134,6 +140,41 @@ www.eden    IN A    10.31.3.3
 ```
 				   
 ## 4. Buat juga reverse domain untuk domain utama 
+ 
+ Untuk membuat reverse, kita perlu menambah zone pada file /etc/bind/named.conf.local pada WISE
+ ```bash
+ #Adding zone reverse dns
+mkdir /etc/bind/wise
+echo "
+zone \"2.31.10.in-addr.arpa\" {
+    type master;
+    file \"/etc/bind/wise/2.31.10.in-addr.arpa\";
+};
+" >> /etc/bind/named.conf.local
+
+rndc reload
+
+echo ";
+; BIND data file for local loopback interface
+;
+\$TTL    604800
+@       IN      SOA    wise.f05.com. root.wise.f05.com. (
+                             2           ; Serial
+                        604800           ; Refresh
+                         86400           ; Retry
+                       2419200           ; Expire
+                        604800 )         ; Negative Cache TTL
+;
+2.31.10.in-addr.arpa.       IN      NS         wise.f05.com.
+2                           IN      PTR        wise.f05.com. ; Byte ke-4 WISE
+
+" > /etc/bind/wise/2.31.10.in-addr.arpa
+
+rndc reload
+service bind9 restart
+clear
+echo "Reverse DNS Added"
+ ```
 
 ## 5. Agar dapat tetap dihubungi jika server WISE bermasalah, buatlah juga Berlint sebagai DNS Slave untuk domain utama 
 
