@@ -184,41 +184,6 @@ service bind9 restart
 clear
 echo "Reverse DNS Added"
  ```
- 
- Untuk membuat reverse, kita perlu menambah zone pada file /etc/bind/named.conf.local pada WISE
- ```bash
- #Adding zone reverse dns
-mkdir /etc/bind/wise
-echo "
-zone \"2.31.10.in-addr.arpa\" {
-    type master;
-    file \"/etc/bind/wise/2.31.10.in-addr.arpa\";
-};
-" >> /etc/bind/named.conf.local
-
-rndc reload
-
-echo ";
-; BIND data file for local loopback interface
-;
-\$TTL    604800
-@       IN      SOA    wise.f05.com. root.wise.f05.com. (
-                             2           ; Serial
-                        604800           ; Refresh
-                         86400           ; Retry
-                       2419200           ; Expire
-                        604800 )         ; Negative Cache TTL
-;
-2.31.10.in-addr.arpa.       IN      NS         wise.f05.com.
-2                           IN      PTR        wise.f05.com. ; Byte ke-4 WISE
-
-" > /etc/bind/wise/2.31.10.in-addr.arpa
-
-rndc reload
-service bind9 restart
-clear
-echo "Reverse DNS Added"
- ```
 
 Hasil reverse DNS
 <img src="image\reverse_dns.png">
