@@ -121,7 +121,12 @@ Jalankan ping pada client sss atau garden
 
 ## 3. Setelah itu ia juga ingin membuat subdomain eden.wise.yyy.com dengan alias www.eden.wise.yyy.com yang diatur DNS-nya di WISE dan mengarah ke Eden
 
+Pertama jalankan 
 
+```bash
+nano wise.f05.com.sh
+```
+Selanjutnya inputkan kode berikut
 
 ```bash
 #Tambahkan prefix eden. dan www.eden. pada file /etc/bind/wise/wise.f05.com
@@ -144,6 +149,19 @@ www.eden    IN A    10.31.3.3
 @       IN      AAAA    ::1
 " > /etc/bind/wise/wise.f05.com
 ```
+
+Save kemudian
+
+```bash
+bash wise.f05.com.sh
+```
+
+Kemudian lanjutkan
+
+```bash
+service bind9 restart
+```
+
 untuk memastikan apakah sudah bisa maka dapat melakukan ping pada eden dan www.eden
 
 ![image](https://user-images.githubusercontent.com/94375772/198834828-55d33ae7-b238-4b84-8792-8bc800145ba7.png)
