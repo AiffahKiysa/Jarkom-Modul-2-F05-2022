@@ -218,7 +218,7 @@ seteleha itu coba ping www.wise.f05.com dari client
 ```bash
 ping www.wise.f05.com -c 2
 ```
-
+<img src="image\5. Slave.jpg">
 
 ## 6. Karena banyak informasi dari Handler, buatlah subdomain yang khusus untuk operation yaitu operation.wise.yyy.com dengan alias www.operation.wise.yyy.com yang didelegasikan dari WISE ke Berlint dengan IP menuju ke Eden dalam folder operation 
 
