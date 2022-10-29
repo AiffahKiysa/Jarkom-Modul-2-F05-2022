@@ -8,7 +8,7 @@
 <img src="image\imageTopologiSoal.png">
 
 ### Network configuration for node (router) Ostania
-<img src="image\ostania.png">
+<img src="image\ostania.png>
 
 ### Network configuration for node WISE
 <img src="image\wise.png">
@@ -55,33 +55,36 @@ ping google.com -c 2
 
 ## 2. Untuk mempermudah mendapatkan informasi mengenai misi dari Handler, bantulah Loid membuat website utama dengan akses wise.yyy.com dengan alias www.wise.yyy.com pada folder wise
 
-Melakukan instalasi bind9 di wise
-```
-apt-get update
-apt-get install bind9 -y
-```
-Kemudian ubah file /etc/resolv.conf untuk connect ke IP WISE
+Jalankan shell script dibawah ini untuk meng-install service bind9 yang akan dibutuhkan
 
-### Membuat domain wise.f05.com
-Buat direktori wise didalam bind
+```bash
+apt clean
+apt update
+apt upgrade
+apt install -y bind9
+clear
+service bind9
 ```
+Setelah selesai baru kita jalankan bash untuk setup domainnya
+```bash
+#setup DNS Master (domain name) at wise
+
 mkdir /etc/bind/wise
-```
-Buat domain dengan mengisi konfigurasi file named.conf.local seperti berikut
-```
+
+#Buat domain	
 echo "
 zone \"wise.f05.com\" {
 	type master;
 	file \"/etc/bind/wise/wise.f05.com\";
 };
+
 " > /etc/bind/named.conf.local
-```
-Copy file db.lokal ke file wise.f05.com
-```
+
+rndc reload
+
 cp /etc/bind/db.local /etc/bind/wise/wise.f05.com
-```
-Set domain name dengan menambahkan CNAME untuk wise.f05.com dan sesuaikan IP WISE
-```
+
+#Set domain name
 echo ";
 ; BIND data file for local loopback interface
 ;
@@ -98,18 +101,24 @@ echo ";
 www     IN      CNAME   wise.f05.com.
 @       IN      AAAA    ::1
 " > /etc/bind/wise/wise.f05.com
-```
 
-Kemudian restart bind9 dan jalankan ping wise.f05.com
-```
+#DONE set domain name with CNAME
+
 service bind9 restart
+clear
+echo "Set Up www.wise.f05.com done"
 ```
-Jalankan ping pada client sss atau garden
-<img src="image\ping_wise_sss.png">
-
+Setelah selesai setup, pada node client, ubah file /etc/resolv.conf untuk mengarah ke IP Wise (10.31.2.2)
+```
+#Change nameserver to IP WISE
+echo "nameserver 10.31.2.2" > /etc/resolv.conf
+ping wise.f05.com -c 2				   
+```
+				   
 ## 3. Setelah itu ia juga ingin membuat subdomain eden.wise.yyy.com dengan alias www.eden.wise.yyy.com yang diatur DNS-nya di WISE dan mengarah ke Eden
-Untuk membuat subdomain kita tinggal menambahkan konfigurasi www.eden dengan IP eden pada file wise.f05.com
-```
+
+```bash
+#Tambahkan prefix eden. dan www.eden. pada file /etc/bind/wise/wise.f05.com
 echo ";
 ; BIND data file for local loopback interface
 ;
@@ -129,25 +138,22 @@ www.eden    IN A    10.31.3.3
 @       IN      AAAA    ::1
 " > /etc/bind/wise/wise.f05.com
 ```
-Kemudian restart bind9 dan www.wise.f05.com dapat diakses
-
-
+				   
 ## 4. Buat juga reverse domain untuk domain utama 
-Buka command pada wise, kemudian pada file named.conf.local tambahkan konfigurasi untuk reverse DNS
-```
-zone "2.31.10.in-addr.arpa" {
+ 
+ Untuk membuat reverse, kita perlu menambah zone pada file /etc/bind/named.conf.local pada WISE
+ ```bash
+ #Adding zone reverse dns
+mkdir /etc/bind/wise
+echo "
+zone \"2.31.10.in-addr.arpa\" {
     type master;
-    file "/etc/bind/wise/2.31.10.in-addr.arpa";
+    file \"/etc/bind/wise/2.31.10.in-addr.arpa\";
 };
-```
-sehingga file named.conf.local isinya menjadi seperti berikut
+" >> /etc/bind/named.conf.local
 
-Kemudian reverse DNS dengan copy db.local ke file address berikut
-```
-cp /etc/bind/db.local /etc/bind/wise/2.31.10.in-addr.arpa
-```
-ubah juga setting untuk reverse DNS
-```
+rndc reload
+
 echo ";
 ; BIND data file for local loopback interface
 ;
@@ -163,7 +169,12 @@ echo ";
 2                           IN      PTR        wise.f05.com. ; Byte ke-4 WISE
 
 " > /etc/bind/wise/2.31.10.in-addr.arpa
-```
+
+rndc reload
+service bind9 restart
+clear
+echo "Reverse DNS Added"
+ ```
 
 ## 5. Agar dapat tetap dihubungi jika server WISE bermasalah, buatlah juga Berlint sebagai DNS Slave untuk domain utama 
 
