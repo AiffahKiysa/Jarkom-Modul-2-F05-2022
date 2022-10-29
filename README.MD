@@ -8,7 +8,7 @@
 <img src="image\imageTopologiSoal.png">
 
 ### Network configuration for node (router) Ostania
-<img src="image\ostania.png>
+<img src="image\ostania.png">
 
 ### Network configuration for node WISE
 <img src="image\wise.png">
@@ -116,9 +116,12 @@ ping wise.f05.com -c 2
 ```
 				   
 Jalankan ping pada client sss atau garden
+
 <img src="image\ping_wise_sss.png">
 
 ## 3. Setelah itu ia juga ingin membuat subdomain eden.wise.yyy.com dengan alias www.eden.wise.yyy.com yang diatur DNS-nya di WISE dan mengarah ke Eden
+
+
 
 ```bash
 #Tambahkan prefix eden. dan www.eden. pada file /etc/bind/wise/wise.f05.com
@@ -141,7 +144,10 @@ www.eden    IN A    10.31.3.3
 @       IN      AAAA    ::1
 " > /etc/bind/wise/wise.f05.com
 ```
-				   
+untuk memastikan apakah sudah bisa maka dapat melakukan ping pada eden dan www.eden
+
+![image](https://user-images.githubusercontent.com/94375772/198834828-55d33ae7-b238-4b84-8792-8bc800145ba7.png)
+		   
 ## 4. Buat juga reverse domain untuk domain utama 
  
  Untuk membuat reverse, kita perlu menambah zone pada file /etc/bind/named.conf.local pada WISE
