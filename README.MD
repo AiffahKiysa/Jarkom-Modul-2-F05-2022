@@ -115,6 +115,9 @@ echo "nameserver 10.31.2.2" > /etc/resolv.conf
 ping wise.f05.com -c 2				   
 ```
 				   
+Jalankan ping pada client sss atau garden
+<img src="image\ping_wise_sss.png">
+
 ## 3. Setelah itu ia juga ingin membuat subdomain eden.wise.yyy.com dengan alias www.eden.wise.yyy.com yang diatur DNS-nya di WISE dan mengarah ke Eden
 
 ```bash
@@ -175,6 +178,44 @@ service bind9 restart
 clear
 echo "Reverse DNS Added"
  ```
+ 
+ Untuk membuat reverse, kita perlu menambah zone pada file /etc/bind/named.conf.local pada WISE
+ ```bash
+ #Adding zone reverse dns
+mkdir /etc/bind/wise
+echo "
+zone \"2.31.10.in-addr.arpa\" {
+    type master;
+    file \"/etc/bind/wise/2.31.10.in-addr.arpa\";
+};
+" >> /etc/bind/named.conf.local
+
+rndc reload
+
+echo ";
+; BIND data file for local loopback interface
+;
+\$TTL    604800
+@       IN      SOA    wise.f05.com. root.wise.f05.com. (
+                             2           ; Serial
+                        604800           ; Refresh
+                         86400           ; Retry
+                       2419200           ; Expire
+                        604800 )         ; Negative Cache TTL
+;
+2.31.10.in-addr.arpa.       IN      NS         wise.f05.com.
+2                           IN      PTR        wise.f05.com. ; Byte ke-4 WISE
+
+" > /etc/bind/wise/2.31.10.in-addr.arpa
+
+rndc reload
+service bind9 restart
+clear
+echo "Reverse DNS Added"
+ ```
+
+Hasil reverse DNS
+<img src="image\reverse_dns.png">
 
 ## 5. Agar dapat tetap dihubungi jika server WISE bermasalah, buatlah juga Berlint sebagai DNS Slave untuk domain utama 
 
@@ -184,9 +225,6 @@ echo "Reverse DNS Added"
 
 ## 8. Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver. Pertama dengan webserver www.wise.yyy.com. Pertama, Loid membutuhkan webserver dengan DocumentRoot pada /var/www/wise.yyy.com
 
-<<<<<<< HEAD
-## 9. Setelah itu, Loid juga membutuhkan agar url www.wise.yyy.com/index.php/home dapat menjadi menjadi www.wise.yyy.com/home
-=======
 ## 9. Setelah itu, Loid juga membutuhkan agar url www.wise.yyy.com/index.php/home dapat menjadi menjadi www.wise.yyy.com/home
 
 ## 10. Setelah itu, pada subdomain www.eden.wise.yyy.com, Loid membutuhkan penyimpanan aset yang memiliki DocumentRoot pada /var/www/eden.wise.yyy.com
@@ -204,4 +242,3 @@ echo "Reverse DNS Added"
 ## 16. dan setiap kali mengakses IP Eden akan dialihkan secara otomatis ke www.wise.yyy.com
 
 ## 17. Karena website www.eden.wise.yyy.com semakin banyak pengunjung dan banyak modifikasi sehingga banyak gambar-gambar yang random, maka Loid ingin mengubah request gambar yang memiliki substring “eden” akan diarahkan menuju eden.png. Bantulah Agent Twilight dan Organisasi WISE menjaga perdamaian!
->>>>>>> 254f6e510cdafd42f4229ba2edde459645b6f80c
