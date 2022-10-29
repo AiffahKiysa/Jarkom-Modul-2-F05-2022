@@ -53,6 +53,13 @@ ping google.com -c 2
 ### Hasil ping google pada berlint
 <img src="image\ping_google_berlint.png">
 
+Problem :
+karena iptables tidak kelihatan sudah behrasil apa belum jadi dijalankan
+```bash
+iptables -t nat -L
+```
+agar iptables ter-save, maka ada command tambahan diatas, agar jika ter-restart tetep aman
+
 ## 2. Untuk mempermudah mendapatkan informasi mengenai misi dari Handler, bantulah Loid membuat website utama dengan akses wise.yyy.com dengan alias www.wise.yyy.com pada folder wise
 
 Jalankan shell script dibawah ini untuk meng-install service bind9 yang akan dibutuhkan
@@ -119,8 +126,10 @@ Jalankan ping pada client sss atau garden
 
 <img src="image\ping_wise_sss.png">
 
-## 3. Setelah itu ia juga ingin membuat subdomain eden.wise.yyy.com dengan alias www.eden.wise.yyy.com yang diatur DNS-nya di WISE dan mengarah ke Eden
+Problem:
+Pastikan nameserver mengarah ke IP Wise 10.31.2.2
 
+## 3. Setelah itu ia juga ingin membuat subdomain eden.wise.yyy.com dengan alias www.eden.wise.yyy.com yang diatur DNS-nya di WISE dan mengarah ke Eden
 
 
 ```bash
@@ -220,6 +229,18 @@ ping www.wise.f05.com -c 2
 ```
 <img src="image\5. Slave.jpg">
 
+Problem:
+ada lupa spasi di:
+```bash
+echo"
+blablabla "
+```
+harusnya
+```bash
+echo "
+blablabla "
+```
+
 ## 6. Karena banyak informasi dari Handler, buatlah subdomain yang khusus untuk operation yaitu operation.wise.yyy.com dengan alias www.operation.wise.yyy.com yang didelegasikan dari WISE ke Berlint dengan IP menuju ke Eden dalam folder operation 
 
 jalankan command bash dibawah ini, konfigurasi hampir sama seperti DNS Master wise, tapi butuh diatur /etc/bind/named.conf.options nya
@@ -256,6 +277,9 @@ www             IN      CNAME   operation.wise.f05.com.
 service bind9 restart
 ```
 <img src="image\6. ping.jpg">
+
+problem:
+saat selesai konfigurasi tanpa ngubah named.conf.options, saat ngeping akan ke website random seperti saat ngeping wise tapi nameserver masih ke NAT
 
 ## 7. Untuk informasi yang lebih spesifik mengenai Operation Strix, buatlah subdomain melalui Berlint dengan akses strix.operation.wise.yyy.com dengan alias www.strix.operation.wise.yyy.com yang mengarah ke Eden
 
