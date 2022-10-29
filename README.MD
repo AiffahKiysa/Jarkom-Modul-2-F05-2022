@@ -222,7 +222,52 @@ ping www.wise.f05.com -c 2
 
 ## 6. Karena banyak informasi dari Handler, buatlah subdomain yang khusus untuk operation yaitu operation.wise.yyy.com dengan alias www.operation.wise.yyy.com yang didelegasikan dari WISE ke Berlint dengan IP menuju ke Eden dalam folder operation 
 
+jalankan command bash dibawah ini, konfigurasi hampir sama seperti DNS Master wise, tapi butuh diatur /etc/bind/named.conf.options nya
+```bash
+#kalau gak diatur ini, saat ngeping akan ke website random seperti saat ngeping wise tapi nameserver masih ke NAT
+echo "
+options {
+        directory \"/var/cache/bind\";
+        allow-query{any;};
+        auth-nxdomain no;    # conform to RFC1035
+        listen-on-v6 { any; };
+};
+" > /etc/bind/named.conf.options
+
+echo "
+zone \"operation.wise.f05.com\"{
+        type master;
+        file \"/etc/bind/operation/operation.wise.f05.com\";
+}; " >> /etc/bind/named.conf.local
+mkdir /etc/bind/operation
+echo "
+\$TTL    604800
+@       IN      SOA     operation.wise.f05.com. root.operation.wise.f05.com. (
+                                2      ; Serial
+                        604800         ; Refresh
+                        86400         ; Retry
+                        2419200         ; Expire
+                        604800 )       ; Negative Cache TTL
+;
+@               IN      NS      operation.wise.f05.com.
+@               IN      A       10.31.3.3       ;ip Eden
+www             IN      CNAME   operation.wise.f05.com.
+" > /etc/bind/operation/operation.wise.f05.com
+service bind9 restart
+```
+<img src="image\6. ping.jpg">
+
 ## 7. Untuk informasi yang lebih spesifik mengenai Operation Strix, buatlah subdomain melalui Berlint dengan akses strix.operation.wise.yyy.com dengan alias www.strix.operation.wise.yyy.com yang mengarah ke Eden
+
+tinggal tambahkan CNAME strix dan www.strix pada file /etc/bind/operation/operation.wise.f05.com
+```bash
+echo "
+strix IN CNAME operation.wise.f05.com.
+www.strix IN CNAME operation.wise.f05.com.
+" >> /etc/bind/operation/operation.wise.f05.com
+service bind9 restart
+```
+<img src="image\7.strix.jpg">
 
 ## 8. Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver. Pertama dengan webserver www.wise.yyy.com. Pertama, Loid membutuhkan webserver dengan DocumentRoot pada /var/www/wise.yyy.com
 
