@@ -121,12 +121,7 @@ Jalankan ping pada client sss atau garden
 
 ## 3. Setelah itu ia juga ingin membuat subdomain eden.wise.yyy.com dengan alias www.eden.wise.yyy.com yang diatur DNS-nya di WISE dan mengarah ke Eden
 
-Pertama jalankan 
 
-```bash
-nano wise.f05.com.sh
-```
-Selanjutnya inputkan kode berikut
 
 ```bash
 #Tambahkan prefix eden. dan www.eden. pada file /etc/bind/wise/wise.f05.com
@@ -149,19 +144,6 @@ www.eden    IN A    10.31.3.3
 @       IN      AAAA    ::1
 " > /etc/bind/wise/wise.f05.com
 ```
-
-Save kemudian
-
-```bash
-bash wise.f05.com.sh
-```
-
-Kemudian lanjutkan
-
-```bash
-service bind9 restart
-```
-
 untuk memastikan apakah sudah bisa maka dapat melakukan ping pada eden dan www.eden
 
 ![image](https://user-images.githubusercontent.com/94375772/198834828-55d33ae7-b238-4b84-8792-8bc800145ba7.png)
@@ -207,6 +189,36 @@ Hasil reverse DNS
 <img src="image\reverse_dns.png">
 
 ## 5. Agar dapat tetap dihubungi jika server WISE bermasalah, buatlah juga Berlint sebagai DNS Slave untuk domain utama 
+
+jalankan command ini untuk menambahkan Berlint dengan IP 10.31.3.2 sebagai DNS Slave
+```bash
+echo "
+zone \"wise.f05.com\" {
+	also-notify { 10.31.3.2; };
+	allow-transfer { 10.31.3.2; };
+};
+" >> /etc/bind/named.conf.local
+service bind9 restart
+```
+Pada node Berlint, jalankan command ini untuk menjadi DNS Slave dari DNS Master WISE dengan IP 10.31.2.2
+```bash
+echo "
+zone \"wise.f05.com\" {
+    type slave;
+    masters { 10.31.2.2; };
+    file \"/var/lib/bind/wise.f05.com\";
+};" > /etc/bind/named.conf.local
+service bind9 restart
+```
+setelah itu untuk mencoba, stop service bind9 pada WISE
+```bash
+service bind9 stop
+```
+seteleha itu coba ping www.wise.f05.com dari client 
+```bash
+ping www.wise.f05.com -c 2
+```
+
 
 ## 6. Karena banyak informasi dari Handler, buatlah subdomain yang khusus untuk operation yaitu operation.wise.yyy.com dengan alias www.operation.wise.yyy.com yang didelegasikan dari WISE ke Berlint dengan IP menuju ke Eden dalam folder operation 
 
